@@ -6,8 +6,14 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load the dataset
-file_path = "/Users/ramseysalem/Documents/Machine Learning 1/mock_warehouse_data_for_sale_sold.csv"
-warehouse_data = pd.read_csv(file_path)
+try: 
+    file_path = "/Users/ramseysalem/Documents/Machine Learning 1/mock_warehouse_data_for_sale_sold.csv"
+    warehouse_data = pd.read_csv(file_path)
+except FileNotFoundError:
+    print(f"File path {file_path} does not exist; trying again with another path")
+    file_path = "mock_warehouse_data_for_sale_sold.csv"
+    warehouse_data = pd.read_csv(file_path)
+    print(warehouse_data.head())
 
 # Feature selection
 categorical_features = [
