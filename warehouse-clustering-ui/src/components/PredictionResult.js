@@ -14,31 +14,49 @@ import {
 } from '@mui/material';
 
 const PredictionResult = ({ prediction }) => {
-  const { cluster, is_outlier, price_stats } = prediction;
+  const { 
+    warehouse_name,
+    investment_score,
+    is_undervalued,
+    estimated_annual_roi,
+    sale_probability,
+    market_segment,
+    value_index,
+    opportunity_tier,
+    price_stats
+  } = prediction;
   
-  // Define colors for different clusters
-  const clusterColors = ['#3f51b5', '#f44336', '#4caf50', '#ff9800'];
+  // Define colors for different opportunity tiers
+  const tierColors = {
+    'Premium': '#4caf50',
+    'High': '#2196f3',
+    'Good': '#ff9800',
+    'Fair': '#9e9e9e',
+    'Low': '#f44336'
+  };
   
-  // Get descriptions for the clusters
-  const getClusterDescription = (clusterNum) => {
-    switch (clusterNum) {
-      case 0:
-        return "High value warehouses with premium features";
-      case 1:
-        return "Mid-tier warehouses with balanced characteristics";
-      case 2:
-        return "Budget warehouses with basic amenities";
-      case 3:
-        return "Specialized warehouses with unique features";
+  // Get descriptions for the opportunity tiers
+  const getTierDescription = (tier) => {
+    switch (tier) {
+      case 'Premium':
+        return "Exceptional investment opportunity with high potential returns";
+      case 'High':
+        return "Strong investment opportunity with good potential returns";
+      case 'Good':
+        return "Good investment opportunity with solid potential returns";
+      case 'Fair':
+        return "Fair investment opportunity with moderate potential returns";
+      case 'Low':
+        return "Basic investment opportunity with limited potential returns";
       default:
-        return "Unknown cluster type";
+        return "Unknown opportunity tier";
     }
   };
   
   return (
     <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
       <Typography variant="h5" gutterBottom>
-        Analysis Results
+        Investment Analysis Results
       </Typography>
       
       <Divider sx={{ mb: 3 }} />
@@ -47,13 +65,13 @@ const PredictionResult = ({ prediction }) => {
         <Grid item xs={12} md={6}>
           <Box sx={{ mb: 3 }}>
             <Typography variant="h6" gutterBottom>
-              Cluster Assignment
+              Investment Opportunity
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <Chip 
-                label={`Cluster ${cluster}`} 
+                label={opportunity_tier} 
                 sx={{ 
-                  backgroundColor: clusterColors[cluster], 
+                  backgroundColor: tierColors[opportunity_tier], 
                   color: 'white',
                   fontWeight: 'bold',
                   fontSize: '1.1rem',
@@ -62,67 +80,73 @@ const PredictionResult = ({ prediction }) => {
                 }} 
               />
               <Typography variant="body1" sx={{ ml: 2, fontWeight: 'medium' }}>
-                {getClusterDescription(cluster)}
+                {getTierDescription(opportunity_tier)}
               </Typography>
             </Box>
+            <Typography variant="body1" sx={{ mt: 1 }}>
+              Investment Score: {investment_score}/100
+            </Typography>
           </Box>
           
           <Box>
             <Typography variant="h6" gutterBottom>
-              Outlier Status
+              Value Assessment
             </Typography>
             <Chip 
-              label={is_outlier ? "Price Outlier" : "Normal Price Range"} 
-              color={is_outlier ? "error" : "success"}
+              label={is_undervalued ? "Undervalued Property" : "Fairly Valued"} 
+              color={is_undervalued ? "success" : "info"}
               sx={{ fontWeight: 'medium' }}
             />
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              {is_outlier 
-                ? "This warehouse's price is significantly different from others in its cluster."
-                : "This warehouse's price is within the expected range for its cluster."}
+              {is_undervalued 
+                ? "This property appears to be undervalued compared to similar properties in the market."
+                : "This property is valued within the expected range for similar properties."}
             </Typography>
           </Box>
         </Grid>
         
         <Grid item xs={12} md={6}>
           <Typography variant="h6" gutterBottom>
-            Price Analysis
+            Financial Analysis
           </Typography>
           <TableContainer>
             <Table size="small">
               <TableBody>
                 <TableRow>
-                  <TableCell component="th" scope="row">Your Price</TableCell>
-                  <TableCell align="right">${price_stats.submitted_price.toFixed(2)} per sq ft</TableCell>
+                  <TableCell component="th" scope="row">Estimated Annual ROI</TableCell>
+                  <TableCell align="right">{estimated_annual_roi.toFixed(2)}%</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell component="th" scope="row">Cluster 25th Percentile (Q1)</TableCell>
-                  <TableCell align="right">${price_stats.q1.toFixed(2)} per sq ft</TableCell>
+                  <TableCell component="th" scope="row">Sale Probability</TableCell>
+                  <TableCell align="right">{(sale_probability * 100).toFixed(1)}%</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell component="th" scope="row">Cluster 75th Percentile (Q3)</TableCell>
-                  <TableCell align="right">${price_stats.q3.toFixed(2)} per sq ft</TableCell>
+                  <TableCell component="th" scope="row">Value Index</TableCell>
+                  <TableCell align="right">{value_index.toFixed(2)}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell component="th" scope="row">Lower Bound for Outliers</TableCell>
-                  <TableCell align="right">${price_stats.lower_bound.toFixed(2)} per sq ft</TableCell>
+                  <TableCell component="th" scope="row">Market Segment</TableCell>
+                  <TableCell align="right">{market_segment}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell component="th" scope="row">Upper Bound for Outliers</TableCell>
-                  <TableCell align="right">${price_stats.upper_bound.toFixed(2)} per sq ft</TableCell>
+                  <TableCell component="th" scope="row">Price per SqFt</TableCell>
+                  <TableCell align="right">${price_stats.price_per_sqft.toFixed(2)}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell component="th" scope="row">Cap Rate</TableCell>
+                  <TableCell align="right">{price_stats.cap_rate.toFixed(2)}%</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell component="th" scope="row">Total Price</TableCell>
+                  <TableCell align="right">${price_stats.total_price.toLocaleString()}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell component="th" scope="row">NOI</TableCell>
+                  <TableCell align="right">${price_stats.noi.toLocaleString()}</TableCell>
                 </TableRow>
               </TableBody>
             </Table>
           </TableContainer>
-          {is_outlier && (
-            <Box sx={{ mt: 2, p: 1, backgroundColor: '#fff3e0', borderRadius: 1 }}>
-              <Typography variant="body2" color="warning.dark">
-                {price_stats.submitted_price < price_stats.lower_bound
-                  ? "This warehouse is potentially underpriced compared to similar properties."
-                  : "This warehouse is potentially overpriced compared to similar properties."}
-              </Typography>
-            </Box>
-          )}
         </Grid>
       </Grid>
     </Paper>
